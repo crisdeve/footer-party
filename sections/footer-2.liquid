@@ -1,0 +1,239 @@
+<div class="footer-blocks">
+  <div class="grid">
+    <div
+      class="footer-blocks__linklist footer-blocks__newsletter"
+      role="navigation"
+      aria-label="Footer newlatter form"
+    >
+      <span class="h3">
+        {{ "newsletter.title" | t }}
+      </span>
+
+      <span class="footer-blocks__newsletter-subtitle">
+        {{ "newsletter.description" | t }}
+      </span>
+  
+      {%- form 'customer', id: 'ContactFooter', class: "newslatter-form" -%}
+        <input
+          type="hidden"
+          name="contact[tags]"
+          value="newsletter"
+        />
+  
+        <div class="form__textfield">
+          <label for="NewsletterForm--{{ section.id }}" class="hidden-accessibility">
+            {{ 'newsletter.label' | t }}
+          </label>
+  
+          <input
+            id="NewsletterForm--{{ section.id }}"
+            type="email"
+            name="contact[email]"
+            value="{{ form.email }}"
+            aria-required="true"
+            autocorrect="off"
+            autocapitalize="off"
+            autocomplete="email"
+            {% if form.errors %}
+              autofocus
+              aria-invalid="true"
+              aria-describedby="ContactFooter-error"
+            {% elsif form.posted_successfully? %}
+              aria-describedby="ContactFooter-success"
+            {% endif %}
+            placeholder="{{ 'newsletter.label' | t }}"
+            required
+          />
+        </div>
+  
+        {% assign button_text = 'newsletter.button_label' | t %}
+  
+        {% render 'button'
+          class: "btn-1",
+          content: button_text,
+          action: "submit"
+        %}
+  
+        {%- if form.errors -%}
+          <small role="alert" aria-live="polite" id="ContactFooter-error">
+            {{ form.errors.translated_fields['email'] | capitalize }}
+            {{ form.errors.messages['email'] }}
+          </small>
+        {%- else -%}
+          <span
+            role="alert" aria-live="polite"
+            id="ContactFooter-success-exist"
+            class="error-js"
+            tabindex="-1"
+          >
+            ✓ {{ 'newsletter.registered' | t }}
+          </span>
+        {%- endif -%}
+  
+        {%- if form.posted_successfully? -%}
+          <span
+            role="alert" aria-live="polite"
+            id="ContactFooter-success"
+            tabindex="-1"
+          >
+            ✓ {{ 'newsletter.success' | t }}
+          </span>
+        {%- endif -%}
+      {%- endform -%}
+  
+    </div>
+
+    {% for footer_item in linklists[section.settings.footer_menu].links limit: 3 %}
+      {% assign item_title = footer_item.title %}
+      <div
+        tabindex="0"
+        class="footer-blocks__linklist js-toggle-active"
+        role="navigation"
+        aria-label="Footer navigation {{ forloop.index }}"
+        data-active="false"
+      >
+      {% if item_title != blank %}
+        <span class="footer-blocks__title h6">
+          {% if footer_item.url != "#" %}
+            <a 
+              {% if section.settings.url_blank %}
+                target="_blank"
+              {% endif %}
+              href="{{ footer_item.url }}"
+            >
+              {{ item_title }}
+            </a>
+          {% else %}
+            {{ item_title }}
+          {% endif %}
+        </span>
+        <ul class="footer-blocks__items">
+          {% for link in footer_item.links %}
+            <li
+              tabindex="0"
+              {% if section.settings.url_blank %}
+                onclick="window.open('{{ link.url }}', '_blank');"
+              {% else %}
+                onclick="window.location.href = '{{ link.url }}'"
+              {% endif %}
+            >
+              <span>
+                {{ link.title }}
+              </span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      </div>
+    {% endfor %}
+
+    <div
+      tabindex="0"
+      class="footer-blocks__linklist footer-blocks__contact"
+      role="navigation"
+      aria-label="Footer navigation {{ forloop.index }}"
+      data-active="false"
+    >
+    {% if section.blocks.size >= 1 %}
+      <span class="footer-blocks__title h6">
+        {{ section.settings.contact_block_title }}
+      </span>
+
+      <ul class="footer-blocks__items">
+        {% for block in section.blocks %}
+          {% if block.settings.icon != blank %}
+            <li tabindex="0">
+              {% assign img = block.settings.icon | image_url: width: 53 %}
+
+              {% render "render-image"
+                class: "class_image",
+                title: block.settings.icon.alt,
+                img_src: img,
+                img: block.settings.icon,
+                size: "150",
+                alt: block.settings.icon.alt,
+                width: "50",
+                height: "50"
+              %}
+
+              <div>
+                {% if block.settings.text contains '|' %}
+                  {% assign text = block.settings.text | split: '|' %}
+                  {% assign text_bold = text[0] %}
+                  {% assign text_normal = text[1] %}
+
+                  <strong>
+                    {{ text_bold }}
+                  </strong>
+                  {{ text_normal }}
+                {% else %}
+                  {{ block.settings.text }}
+                {% endif %}
+              </div>
+
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        <li>
+          {% render 'media-icons' order_media: settings.order_media %}
+        </li>
+      </ul>
+    {% endif %}
+    </div>
+  </div>
+</div>
+
+{% if section.settings.sub_footer != blank %}
+<div class="footer__creation-msg">
+  {{ section.settings.sub_footer }}
+</div>
+{% endif %}
+
+<!-- eslint-disable max-len -->
+{% schema %}
+{
+  "name": "t:sections.footer.name",
+  "tag": "footer",
+  "class": "footer wrapper",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "footer_menu",
+      "label": "Footer menu columns",
+      "default": "footer"
+    },
+    {
+      "type": "text",
+      "id": "contact_block_title",
+      "label": "Contact block title",
+      "default": "Besoin de nous contacter?"
+    },
+    {
+      "type": "text",
+      "id": "sub_footer",
+      "default": "© 2020 So Classy géré et protégé par Par Natural Origins SA",
+      "label": "Creation message"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "contact_block",
+      "name": "Contact block",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "icon",
+          "label": "Icon"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "info": "To get bold title please separete content with: '|'. Ex: Phone number|57575757"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

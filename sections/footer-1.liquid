@@ -1,0 +1,277 @@
+{%- if request.page_type == 'index' -%}<div class="yotpo yotpo-pictures-widget" data-gallery-id=""></div>{%- endif -%}
+  <div class="footer__link-lists">
+    <div
+      class="accordions"
+      data-toggle="true"
+    >
+      {% for block in section.blocks %}
+        <nav
+          class="footer-link-lists"
+          role="navigation"
+          aria-label="Footer"
+          aria-labelledby="footer-title">
+  
+          {% capture content %}
+            {% if block.settings.menu != blank %}
+              <ul class="footer-link-lists__list">
+                {% for link in linklists[block.settings.menu].links %}
+                  <li>
+                    <a href="{{ link.url }}" title="{{ link.title }}">
+                      {{ link.title }}
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% endcapture %}
+  
+          {% render 'accordion-item',
+            title: block.settings.heading,
+            content: content,
+            active: false
+          %}
+        </nav>
+      {% endfor %}
+    
+      <div class="footer__copy">
+        {% if section.settings.sub_footer != blank %}
+          <span>
+            {% if section.settings.logo != blank %}
+              {{ section.settings.logo | image_url: width: 38 | image_tag: preload: true }}
+            {% endif %}
+            <span>{{ section.settings.sub_footer }}</span>
+          </span>
+        {% endif %}
+  
+        {% if section.settings.payments != blank %}
+          {{ section.settings.payments | image_url: width: 158 | image_tag: preload: true }}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer__newsletter footer-newsletter">
+    <div>
+      {% if section.settings.newsletter_heading != blank %}
+        <span class="footer-newsletter__title">
+          {{ section.settings.newsletter_heading }}
+        </span>
+      {% endif %}
+      
+      {%- form 'customer', id: 'contact-footer' -%}
+        <input
+          type="hidden"
+          name="contact[tags]"
+          value="newsletter"
+        />
+    
+        <div class="footer-newsletter__form">
+          {% assign id = 'NewsletterForm--' | append: section.id %}
+          {% assign placeholder = 'newsletter.label' | t %}
+          
+          {% capture attr %}
+            aria-required="true"
+            autocorrect="off"
+            autocapitalize="off"
+            autocomplete="email"
+            {% if form.errors %}
+              autofocus
+              aria-invalid="true"
+              aria-describedby="contact-footer-error"
+            {% elsif form.posted_successfully? %}
+              aria-describedby="contact-footer-success"
+            {% endif %}
+          {% endcapture %}
+    
+          {% render 'input',
+            class: "text-field-js",
+            type:'email',
+            name: "contact[email]",
+            value: form.email,
+            id: id,
+            placeholder: placeholder,
+            label: placeholder,
+            required: false,
+            attributes: attr
+          %}
+    
+          <button
+            class="btn-3"
+            type="submit"
+            name="commit"
+            id="Subscribe"
+            aria-label="{{ 'newsletter.button_label' | t }}"
+          >
+            {{ 'templates.contact.form.send' | t }}
+          </button>
+        </div>
+    
+        {%- if form.errors -%}
+          <small role="alert" aria-live="polite" id="contact-footer-error">
+            {{ form.errors.translated_fields['email'] | capitalize }}
+            {{ form.errors.messages['email'] }}
+          </small>
+        {%- else -%}
+          <span
+            role="alert" aria-live="polite"
+            id="contact-footer-success-exist"
+            class="h3 error-js"
+            tabindex="-1"
+          >
+            ✓ {{ 'newsletter.registered' | t }}
+          </span>
+        {%- endif -%}
+    
+        {%- if form.posted_successfully? -%}
+          <h3
+            role="alert" aria-live="polite"
+            id="contact-footer-success"
+            tabindex="-1"
+          >
+            ✓ {{ 'newsletter.success' | t }}
+          </h3>
+        {%- endif -%}
+      {%- endform -%}
+  
+      {% if section.settings.newsletter_sub != blank %}
+        <span class="footer-newsletter__subtitle">
+          {{ section.settings.newsletter_sub }}
+        </span>
+      {% endif %}
+  
+      {% if section.settings.icon_1 != blank and section.settings.icon_2 != blank %}
+        <div class="footer-newsletter__icons">
+          {% if section.settings.answer != blank %}
+            <span class="footer-newsletter__title">{{ section.settings.answer }}</span>
+          {% endif %}
+          <div>
+            {% if section.settings.icon_1 != blank %}
+              {{ section.settings.icon_1 | image_url: width: 24 | image_tag: preload: true }}
+            {% endif %}
+            <span>{{ section.settings.icon_text_1 }}</span>
+          </div>
+          <div>
+            {% if section.settings.icon_2 != blank %}
+              {{ section.settings.icon_2 | image_url: width: 24 | image_tag: preload: true }}
+            {% endif %}
+            <span>{{ section.settings.icon_text_2 }}</span>
+          </div>
+        </div>
+      {% endif %}
+  
+      {% if section.settings.social_media %}
+        <div class="footer-newsletter__social">
+          <span class="footer-newsletter__title">{{ section.settings.follow }}</span>
+          {% render 'media-icons', order_media: 'whatsapp instagram facebook youtube' %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  
+  {% schema %}
+  {
+    "name": "Footer",
+    "tag": "footer",
+    "class": "footer",
+    "blocks": [
+      {
+        "type": "link_list",
+        "name": "t:sections.footer.blocks.link_list.name",
+        "settings": [
+          {
+            "type": "text",
+            "id": "heading",
+            "default": "Quick links",
+            "label": "t:sections.footer.blocks.link_list.settings.heading.label",
+            "info": "t:sections.footer.blocks.link_list.settings.heading.info"
+          },
+          {
+            "type": "link_list",
+            "id": "menu",
+            "default": "footer",
+            "label": "t:sections.footer.blocks.link_list.settings.menu.label",
+            "info": "t:sections.footer.blocks.link_list.settings.menu.info"
+          }
+        ]
+      }
+    ],
+    "settings": [
+      {
+        "type": "header",
+        "content": "Newsletter"
+      },
+      {
+        "type": "text",
+        "id": "newsletter_heading",
+        "default": "Subscribe to our emails",
+        "label": "Newsletter heading"
+      },
+      {
+        "type": "richtext",
+        "id": "newsletter_sub",
+        "default": "<p>En vous abonnant, recevez des nouveautés, promotions et actualités de Generik par e-mail. Politique de protection des données personnelles</p>",
+        "label": "Subtext 1"
+      },
+      {
+        "type": "text",
+        "id": "answer",
+        "default": "Des doutes ou des inquiétudes ?",
+        "label": "Subtext 2"
+      },
+      {
+        "type": "inline_richtext",
+        "id": "icon_text_1",
+        "default": "<span>01 34 84 35 35</span>",
+        "label": "Text icon 1"
+      },
+      {
+        "type": "image_picker",
+        "id": "icon_1",
+        "label": "Icon 1"
+      },
+      {
+        "type": "inline_richtext",
+        "id": "icon_text_2",
+        "default": "<span>equipe@generik.fr</span>",
+        "label": "Text icon 2"
+      },
+      {
+        "type": "image_picker",
+        "id": "icon_2",
+        "label": "Icon 2"
+      },
+      {
+        "type": "header",
+        "content": "General settings"
+      },
+      {
+        "type": "text",
+        "id": "sub_footer",
+        "default": "© 2024 Generik. All Rights Reserved  |  Plan du site",
+        "label": "t:sections.footer.blocks.text.name"
+      },
+      {
+        "type": "text",
+        "id": "follow",
+        "default": "Suivez-nous",
+        "label": "Follow"
+      },
+      {
+        "type": "checkbox",
+        "id": "social_media",
+        "label": "Display social media snippet",
+        "default": true
+      },
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo"
+      },
+      {
+        "type": "image_picker",
+        "id": "payments",
+        "label": "Payments"
+      }
+    ]
+  }
+  {% endschema %}

@@ -1,0 +1,285 @@
+{% liquid
+  assign logoSrc = section.settings.footer_logo | image_url: width: 165
+  assign logoAlt = section.settings.footer_logo.alt
+%}
+
+<div class="footer-header">
+  <div class="footer-header__container">
+    {% unless section.settings.footer_logo == blank %}
+      <figure class="footer-header__figure">
+        {% render "render-image"
+          class: "icons-card__image",
+          img_src: logoSrc,
+          alt: logoAlt,
+          width: "165px",
+          height: "80px"
+        %}
+      </figure>
+    {% endunless %}
+    {% render 'reseller-footer'
+      resellerTitle: section.settings.reseller_title,
+      resellerCtaText: section.settings.reseller_cta_text,
+      resellerCtaLink: section.settings.reseller_cta_link
+    %}
+  </div>
+</div>
+<div class="footer-blocks">
+  <div class="grid">
+    {% for block in section.blocks %}
+      {% case block.type %}
+
+        {% when "info" %}
+          <div class="footer-blocks__info">
+            {% if block.settings.heading %}
+              <span class="footer-blocks__info-title h4">
+                {{ block.settings.heading }}
+              </span>
+            {% endif %}
+            {% if block.settings.sub %}
+              <span class="footer-subtitle par-regular par-regular--s">
+                {{ block.settings.sub }}
+              </span>
+            {% endif %}
+          </div>
+
+      {% endcase %}
+    {% endfor %}
+    <div class="footer-blocks__items">
+      {% for block in section.blocks %}
+        {% case block.type %}
+
+          {% when "link_list" %}
+            <div class="footer-blocks__linklist">
+              {% if block.settings.heading != blank %}
+                <span class="footer-title par-semibold par-semibold--m">
+                  {{ block.settings.heading }}
+                </span>
+              {% endif %}
+              {% if block.settings.menu != blank %}
+                <ul class="footer-list">
+                  {% for link in linklists[block.settings.menu].links %}
+                    <li>
+                      <a
+                        href="{{ link.url }}"
+                        class="par-regular par-regular--s"
+                        title="{{ link.title }}"
+                        aria-label="{{ link.title }}">
+                        {{ link.title }}
+                      </a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+
+          {% when "menu_info" %}
+            <div class="footer-blocks__linklist footer-blocks__linklist--last">
+              {% if block.settings.information_heading != blank %}
+                <span class="footer-title par-semibold par-semibold--m">
+                  {{ block.settings.information_heading }}
+                </span>
+              {% endif %}
+              {% if block.settings.information_sub != blank %}
+                <span class="footer-text par-regular par-regular--s">
+                  {{ block.settings.information_sub }}
+                </span>
+              {% endif %}
+            </div>
+
+        {% endcase %}
+      {% endfor %}
+
+      <div class="footer-blocks__linklist">
+        <span class="footer-title par-semibold par-semibold--m">
+          {{ 'sections.footer.follow_us' | t }}
+        </span>
+        {% render 'media-icons'
+          order_media: 'facebook instagram youtube tiktok twitter'
+        %}
+        <div class="payment">
+          <div class="payment__container">
+            <p class="payment__title par-semibold par-semibold--m">
+              {{ 'sections.footer.payment' | t }}
+            </p>
+            {% render 'payment-footer' %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="footer-reseller wrapper wrapper--alternative">
+  {% render 'reseller-footer'
+    resellerTitle: section.settings.reseller_title,
+    resellerCtaText: section.settings.reseller_cta_text,
+    resellerCtaLink: section.settings.reseller_cta_link
+  %}
+</div>
+<div class="footer-general wrapper wrapper--alternative"> 
+  <div class="payment">
+    <div class="payment__container">
+      <p class="payment__title par-semibold par-semibold--m">
+        {{ 'sections.footer.payment' | t }}
+      </p>
+      {% render 'payment-footer' %}
+    </div>
+  </div>
+
+  <ul class="footer-info-list">
+    {% for link in linklists[section.settings.footer_info_menu].links %}
+      <li>
+        <a
+          href="{{ link.url }}"
+          class="par-regular par-regular--xs"
+          title="{{ link.title }}"
+          aria-label="{{ link.title }}">
+          {{ link.title }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <div class="footer-general__messages">
+    {% if section.settings.footer_copyright != blank %}
+      <span class="footer-general__copyright par-semibold par-semibold--xs">
+        {{ section.settings.footer_copyright }}
+      </span>
+    {% endif %}
+
+    {% if section.settings.sub_footer != blank %}
+      <span class="footer-general__developed par-regular par-regular--xs">
+        {{ section.settings.sub_footer }}
+      </span>
+    {% endif %}
+  </div>
+</div>
+
+<!-- eslint-disable max-len -->
+{% schema %}
+{
+  "name": "t:sections.footer.name",
+  "tag": "footer",
+  "class": "footer section-space-padding",
+  "blocks": [
+    {
+      "type": "info",
+      "name": "Our mission",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "default": "NOTRE MISSION",
+          "label": "Heading"
+        },
+        {
+          "type": "richtext",
+          "id": "sub",
+          "default": "<p>Est de vous donner le maximum d’informations et de vous proposer des pièces de qualités, pour que vous puissiez pratiquer cette belle discipline dans les meilleures conditions</p>",
+          "label": "Text"
+        }
+      ]
+    },
+    {
+      "type": "link_list",
+      "name": "t:sections.footer.blocks.link_list.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "default": "Quick links",
+          "label": "t:sections.footer.blocks.link_list.settings.heading.label",
+          "info": "t:sections.footer.blocks.link_list.settings.heading.info"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "default": "footer",
+          "label": "t:sections.footer.blocks.link_list.settings.menu.label",
+          "info": "t:sections.footer.blocks.link_list.settings.menu.info"
+        }
+      ]
+    },
+    {
+      "type": "menu_info",
+      "name": "Menu information",
+      "settings": [
+        {
+          "type": "text",
+          "id": "information_heading",
+          "default": "Information",
+          "label": "Heading"
+        },
+        {
+          "type": "richtext",
+          "id": "information_sub",
+          "default": "<p>200 route du rotey, ZAC de rotey</p>",
+          "label": "Text"
+        }
+      ]
+    },
+    {
+      "type": "payment_block",
+      "name": "Payment block",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image_payments",
+          "label": "Payment logo",
+          "info": "Select the payment logo"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "footer_logo",
+      "label": "Footer logo",
+      "info": "Select the footer logo"
+    },
+    {
+      "type": "header",
+      "content": "Reseller settings"
+    },
+    {
+      "type": "text",
+      "id": "reseller_title",
+      "default": "Devenir revendeur B2B",
+      "label": "Reseller title"
+    },
+    {
+      "type": "text",
+      "id": "reseller_cta_text",
+      "default": "INSCRIVEZ-VOUS",
+      "label": "Reseller CTA text"
+    },
+    {
+      "type": "url",
+      "id": "reseller_cta_link",
+      "label": "Reseller CTA link"
+    },
+    {
+      "type": "header",
+      "content": "Footer info settings"
+    },
+    {
+      "type": "link_list",
+      "id": "footer_info_menu",
+      "default": "footer",
+      "label": "Footer info menu"
+    },
+    {
+      "type": "richtext",
+      "id": "footer_copyright",
+      "default": "<p>2023 - DriftParadiZ Tous les droits sont réservés ©</p>",
+      "label": "Footer copyright"
+    },
+    {
+      "type": "richtext",
+      "id": "sub_footer",
+      "default": "<p>Site web conçu et développé par Gradiweb</p>",
+      "label": "Developed by"
+    }
+  ]
+}
+{% endschema %}
